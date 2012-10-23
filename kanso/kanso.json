@@ -1,0 +1,11 @@
+{
+    "name": "view",
+    "version": "0.0.1",
+    "description": "...",
+    "modules": ["kanso-lib"],
+    "load": "kanso-lib/app",
+    "dependencies": {
+        "properties": null,
+        "modules": null
+    }
+}
