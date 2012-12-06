@@ -28,8 +28,18 @@ exports.departureTimes = function(req, res){
     });
 };
 
+exports.get = function(req, res){
+    req.nano.get(req.params.id).pipe(res);
+};
+
 exports.allByName = function(req, res){
-    req.nano.view("view", "allByName", {}).pipe(res);
+    if(req.query.search){
+        req.query._limit = req.query.limit;
+        delete req.query.limit;
+        req.nano.list("view", "search", "allByName", req.query).pipe(res);
+    }else{
+        req.nano.view("view", "allByName", req.query).pipe(res);
+    }
 };
 
 exports.allByCoords = function(req, res){

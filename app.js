@@ -63,6 +63,7 @@ app.configure(function(){
 app.get('/departure-times/:id', routes.departureTimes);
 app.get('/allByName', routes.allByName);
 app.get('/allByCoords', routes.allByCoords);
+app.get('/get/:id', routes.get);
 
 var options = {
     daemonFile: "busserver.dmn",

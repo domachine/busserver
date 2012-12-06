@@ -26,6 +26,36 @@ exports.views = {
  */
 
 exports.lists = {
+    search: function (head, req) {
+        if (! req.query.search) {
+            return;
+        }
+        var row;
+        var searches = req.query.search.toLowerCase().split(" ");
+        var first = true;
+        send('{"rows":[');
+        var i = Number(req.query._limit);
+        while (i > 0 && (row = getRow())) {
+            var hasMatch = true;
+            for(var index in searches){
+                var search = searches[index];
+                if (row.key.toLowerCase().indexOf(search) === -1){
+                    hasMatch = false;
+                    break;
+                }
+            }
+            if(hasMatch){
+                if (! first) {
+                    send(',');
+                } else {
+                    first = false;
+                }
+                send(JSON.stringify(row));
+                i--;
+            }
+        }
+        send(']}');
+    },
     next: function (head, req) {
         var row;
         var coords = JSON.parse(req.query.coords);
@@ -40,7 +70,7 @@ exports.lists = {
                               location: row.value.location,
                               distance: distance});
         }
-        choices.sort(function(a, b) {
+        choices.sort(function(b, a) {
             if (a.distance < b.distance)
                 return -1;
             else if (a.distance === b.distance)
