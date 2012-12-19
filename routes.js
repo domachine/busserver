@@ -33,7 +33,7 @@ exports.departureTimes = function(req, res){
             return;
         }
         var now = Number(new Date());
-        if(now - doc.lastUpdate <= 45 * 1000)
+        if(now - doc.lastUpdate <= 30 * 1000)
             res.end(JSON.stringify({rows: doc.departures, lastUpdate: doc.lastUpdate}));
         else
             ding.update(doc, function(err, doc){
