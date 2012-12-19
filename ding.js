@@ -18,23 +18,40 @@
 var request = require('request');
 var libxml = require('libxmljs');
 
-exports.update = function (doc, callback, nano) {
+exports.update = function (doc, callback, nano, i) {
+    if(i === undefined)
+        i = 0;
+
+    var url = "http://www.ding.eu/ding2/";
+    if(i % 2 === 1)
+        url = "http://efa-bw.de/nvbw/";
     var id = doc._id.substring(4);
-    request({url:'http://www.ding.eu/ding2/XML_DM_REQUEST?' +
+    request({url: url + 'XML_DM_REQUEST?' +
              'laguage=de&typeInfo_dm=stopID&' +
              'nameInfo_dm=' + id +
              '&deleteAssignedStops_dm=1&useRealtime=1&mode=direct',
+             timeout: 1500,
              encoding: 'binary'},
             function (err, res, xml) {
-                if (err)
+                if (!err)
+                    var parseErr = parseXML(doc, callback, nano, err, res, xml);
+                if((err || parseErr) && i < 5)
+                    exports.update(doc, callback, nano, ++i);
+                else if(err)
                     callback(err);
-                else
-                    parseXML(doc, callback, nano, err, res, xml);
+                else if(parseErr)
+                    callback(parseErr);
             });
 };
 
 function parseXML (doc, callback, nano, err, res, xml) {
-    var $ = libxml.parseXmlString(xml);
+    try{
+        var $ = libxml.parseXmlString(xml);
+    }catch(error){
+        console.log('Error while parsing xml file:');
+        console.log(error);
+        return error;
+    }
     var deps = [];
     $.find('//itdDepartureList/itdDeparture').forEach(function (child) {
         var departure = {
@@ -43,7 +60,12 @@ function parseXML (doc, callback, nano, err, res, xml) {
             countdown: child.attr('countdown').value(),
             isRealTime: true
         };
+
         var servLine = child.find('itdServingLine')[0];
+
+        var itdNoTrain = servLine.find('itdNoTrain');
+        if(itdNoTrain.length > 0 && itdNoTrain[0].attr('delay') !== null)
+            departure.strike = itdNoTrain[0].attr('delay').value() === '-9999';
         departure.direction = servLine.attr('direction').value();
         departure.realtime = servLine.attr('realtime').value();
         departure.line = servLine.attr('number').value();
@@ -66,9 +88,7 @@ function parseXML (doc, callback, nano, err, res, xml) {
         deps.push(departure);
     });
     doc.departures = deps;
-    doc.lastUpdate =
-        Number(new Date($.find('//itdRequest')[0].attr('now').value()
-                        + '+0200'));
+    doc.lastUpdate = Number(new Date());
     callback(null, doc);
     nano.bulk({docs: [doc]}, function (err) {
         if (err) {
