@@ -51,8 +51,10 @@ exports.get = function(req, res){
 
 exports.allByName = function(req, res){
     if(req.query.search){
-        req.query._limit = req.query.limit;
-        delete req.query.limit;
+        if(req.query.limit !== undefined){
+            req.query._limit = req.query.limit;
+            delete req.query.limit;
+        }
         req.nano.list("view", "search", "allByName", req.query).pipe(res);
     }else{
         req.nano.view("view", "allByName", req.query).pipe(res);
