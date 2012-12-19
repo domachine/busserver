@@ -52,7 +52,9 @@ exports.lists = {
         var first = true;
         send('{"rows":[');
         var i = Number(req.query._limit);
-        while (i > 0 && (row = getRow())) {
+        if(req.query._limit === undefined)
+            i = undefined;
+        while ((i > 0 || i === undefined) && (row = getRow())) {
             var hasMatch = true;
             for(var index in searches){
                 var search = searches[index];
@@ -68,7 +70,8 @@ exports.lists = {
                     first = false;
                 }
                 send(JSON.stringify(row));
-                i--;
+                if(i !== undefined)
+                    i--;
             }
         }
         send(']}');
