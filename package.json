@@ -1,6 +1,6 @@
 {
   "name": "busserver",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "scripts": {
     "start": "node app.js"
@@ -11,6 +11,15 @@
     "request": "*",
     "libxmljs": "*",
     "start-stop-daemon": "*",
-    "nano": "*"
+    "nano": "*",
+    "connect": "*",
+    "debug": "*",
+    "methods": "*",
+    "fresh": "*",
+    "range-parser": "*",
+    "cookie": "*",
+    "send": "*",
+    "crc": "*",
+    "errs": "*"
   }
 }
