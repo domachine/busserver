@@ -50,6 +50,7 @@ db.list = function (designname, listname, viewname, params) {
  */
 app.configure(function(){
     app.set('port', process.env.PORT || 3030);//ist PORT 3030 frei?
+    app.use(express.compress());
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
     app.use(express.favicon());
