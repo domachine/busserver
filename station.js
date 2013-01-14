@@ -6,7 +6,7 @@ var libxmljs = require('libxmljs');
 
 var config = {
     file: 'Haltepunkte SWU.kml',
-    prefix: '900',
+    prefix: 'swu-900',
     defaultDistrict: 'Ulm'
 }
 

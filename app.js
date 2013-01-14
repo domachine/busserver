@@ -29,7 +29,7 @@ var express = require('express'),
 
 var app = express();
 
-var db = nano.use('haltestellen');
+var db = nano.use('stations');
 
 var server;
 
@@ -39,7 +39,7 @@ var server;
 db.list = function (designname, listname, viewname, params) {
     var docpath = '_design/' + designname + '/_list/' +
             listname + '/' + viewname;
-    return nano.request({db: 'haltestellen',
+    return nano.request({db: 'stations',
                          doc: docpath,
                          method: 'GET',
                          params: params});
