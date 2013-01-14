@@ -57,7 +57,7 @@ function parseXML (doc, callback, nano, err, res, xml) {
         var departure = {
             platform: child.attr('platform').value(),
             stopID: child.attr('stopID').value(),
-            countdown: child.attr('countdown').value(),
+            countdown: Number(child.attr('countdown').value()),
             isRealTime: true
         };
 
@@ -87,7 +87,9 @@ function parseXML (doc, callback, nano, err, res, xml) {
         departure.dateTime = Number(departure.dateTime);
         deps.push(departure);
     });
-    doc.departures = deps;
+    doc.departures = deps.sort(function (a, b) {
+        return (a.countdown - b.countdown);
+    });
     doc.lastUpdate = Number(new Date());
     callback(null, doc);
     nano.bulk({docs: [doc]}, function (err) {
