@@ -6,7 +6,8 @@ var libxmljs = require('libxmljs');
 
 var config = {
     file: 'Haltepunkte SWU.kml',
-    prefix: '900'
+    prefix: '900',
+    defaultDistrict: 'Ulm'
 }
 
 function parseStations(xml, db) {
@@ -21,7 +22,16 @@ function parseStations(xml, db) {
     /* Each station is a subfolder of the main layer. */
     doc.find('//Folder[@id="layer fmain"]/Folder').forEach(function (folder) {
         var station = {};
-        station.name = folder.get('name').text();
+
+        var stationName = folder.get('name').text();
+        if (stationName.search(/,/) !== -1) {
+            stationName = stationName.split(/,/);
+            station.district = stationName[0];
+            station.name = stationName[1].trim();
+        } else {
+            station.district = config.defaultDistrict;
+            station.name = stationName;
+        }
 
         station.places = [];
         folder.find('Placemark').forEach(function (placemark) {
