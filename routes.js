@@ -23,6 +23,13 @@ var ding = require('./ding');
  */
 exports.departureTimes = function(req, res){
     var id = req.params.id;
+
+    /* The following snippet is necessary to become compatible to the current
+     * swu interface. */
+
+    if (! id.match(/^swu\-900/)) {
+        id = 'swu-900' + id;
+    }
     req.nano.get(id, function(err, doc){
         if (err){
             res.end(JSON.stringify(err));
@@ -34,13 +41,22 @@ exports.departureTimes = function(req, res){
         }
         var now = Number(new Date());
         if(now - doc.lastUpdate <= 30 * 1000)
-            res.end(JSON.stringify({rows: doc.departures, lastUpdate: doc.lastUpdate}));
+            res.end(JSON.stringify({
+                location: doc.ort,
+                name: doc.bezeichnung,
+                rows: doc.departures,
+                lastUpdate: doc.lastUpdate}));
         else
             ding.update(doc, function(err, doc){
                 if (err)
                     res.end(JSON.stringify(err));
                 else
-                    res.end(JSON.stringify({rows: doc.departures, lastUpdate: now}));
+                    res.end(JSON.stringify({
+                        location: doc.ort,
+                        name: doc.bezeichnung,
+                        rows: doc.departures,
+                        lastUpdate: doc.lastUpdate
+                    }));
             }, req.nano);
     });
 };
