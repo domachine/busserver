@@ -23,13 +23,6 @@ var ding = require('./ding');
  */
 exports.departureTimes = function(req, res){
     var id = req.params.id;
-
-    /* The following snippet is necessary to become compatible to the current
-     * swu interface. */
-
-    if (! id.match(/^swu\-900/)) {
-        id = 'swu-900' + id;
-    }
     req.nano.get(id, function(err, doc){
         if (err){
             res.end(JSON.stringify(err));
