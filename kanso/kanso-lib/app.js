@@ -18,22 +18,15 @@
 exports.views = {
     allByName: {
         map: function(doc) {
-            if(doc.geometry.features && doc.geometry.features[0]){
-                var oldid = Math.floor(doc.geometry.features[0].properties.olifid/100);
-                emit(doc.ort + " / " + doc.bezeichnung, oldid );
-            }
+            emit(doc.district + " / " + doc.name, null);
         }
     },
     allByCoords: {
         map: function(doc) {
-            if(doc.geometry.features && doc.geometry.features[0]){
-                var oldid =
-                        Math.floor(doc.geometry.features[0].properties.olifid
-                                   /100);
-                emit(doc.geometry.features[0].geometry.coordinates,
-                     {oldid: oldid,
-                      location: doc.ort + " / " + doc.bezeichnung});
-            }
+            emit([
+                    doc.places[0].coordinates['longitude'],
+                    doc.places[0].coordinates['latitude']],
+                 {location: doc.district + " / " + doc.name});
         }
     }
 };
@@ -82,8 +75,8 @@ exports.lists = {
         var range = 0.005;
         var choices = [];
         while ((row = getRow())) {
-            var distance = Math.sqrt(Math.pow(row.key[0] - coords[0], 2) +
-                                     Math.pow(row.key[1] - coords[1], 2));
+            var distance = Math.sqrt(Math.pow(row.key['longitude'] - coords[0], 2) +
+                                     Math.pow(row.key['latitude'] - coords[1], 2));
             if (distance <= range)
                 choices.push({id: row.id,
                               oldid: row.value.oldid,
